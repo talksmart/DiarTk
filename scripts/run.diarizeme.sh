@@ -21,6 +21,7 @@ fname=$1
 scpfile=$2
 opdir=$3
 fileid=$4
+maxclust=$5
 
 if [ $# -eq 5 ]; then
     beta_val=$5
@@ -44,4 +45,5 @@ $diarizeme_bin \
     --tmpdir $opdir \
     -s $scpfile \
     --beta $beta_val \
+    --maxclust $maxclust \
     --nthread $nthreads > $opdir/$fileid.out

@@ -51,7 +51,7 @@ int read_scp_file(const char *in_filename, int **out_seginfo, int *num_segs)
       ivel.push_back(start);
       ivel.push_back(end);
       pos.push_back(ivel);
-      //printf("SCP READ %d %d\n",ivel[0], ivel[1]);
+      printf("SCP READ %d %d\n",ivel[0], ivel[1]);
    }
 
    long last_speech_frame = ivel[1];
@@ -78,7 +78,7 @@ int read_scp_file(const char *in_filename, int **out_seginfo, int *num_segs)
          ivel.push_back(start);
          ivel.push_back(end);
          pos.push_back(ivel);
-         //printf(" speech seg = %d %d\n",ivel[0], ivel[1]);
+         printf(" speech seg = %d %d\n",ivel[0], ivel[1]);
       }
       sp_flag = is_speech_frame[fr];
    }
@@ -88,12 +88,12 @@ int read_scp_file(const char *in_filename, int **out_seginfo, int *num_segs)
    {
       (*out_seginfo)[2*i] = pos[i][0];
       (*out_seginfo)[2*i+1] = pos[i][1];
-      //printf("< %7d %7d >\n",(*out_seginfo)[2*i],(*out_seginfo)[2*i+1]);
+      printf("< %7d %7d >\n",(*out_seginfo)[2*i],(*out_seginfo)[2*i+1]);
    }
 
-   //printf("\n Sorted List \n");
-   //for (int i =0; i <pos.size(); ++i)
-   //printf("%d %d\n",pos[i][0], pos[i][1]);
+   printf("\n Sorted List \n");
+   for (int i =0; i <pos.size(); ++i)
+   printf("%d %d\n",pos[i][0], pos[i][1]);
 
    *num_segs = pos.size();
    printf("number of segments inside = %d\n",*num_segs);
