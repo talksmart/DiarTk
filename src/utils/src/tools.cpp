@@ -78,6 +78,12 @@ namespace libtools
 
 
 
+  double absolute(double value)
+  {
+    if (value>=0) return value;
+    else return -value;
+  }
+
   double kldivergence(vector <double> *v1, vector <double> *v2, int Chk_q)
   {
     if ( !(checkprobvector(v1)) ) { throw notaprobvector(); }
@@ -104,11 +110,26 @@ namespace libtools
 	  {
 	    double tmp=(*kliterator_v1)/(*kliterator_v2);
 	    klvalue = klvalue + (*kliterator_v1)* MyLog(tmp);
-	    //cout << "KL value " << klvalue << " " << *kliterator_v1 << " " << *kliterator_v2 << " " << MyLog(tmp) <<"\n";
+	//    cout << "KL value " << klvalue << " " << *kliterator_v1 << " " << *kliterator_v2 << " " << MyLog(tmp) <<"\n";
 	  }
       }
     
-    if ( !(klvalue >=0) ){ cout << "problem with a KL " << klvalue  << "\n\n"; exit(1);}
+    if ( absolute(klvalue) < 0.0E-10 ){ cout << "problem with a KL " << klvalue  << "\n\n"; 
+    klvalue = 0.0E-20;
+    for (kliterator_v1 = v1->begin(),
+           kliterator_v2 = v2->begin(); kliterator_v1 != v1->end(),
+           kliterator_v2 != v2->end(); ++kliterator_v1,++kliterator_v2 )
+      { 
+        if (*kliterator_v1 > 0)
+          //if (*kliterator_v1 > 0 && *kliterator_v2 > 0)
+          { 
+            double tmp=(*kliterator_v1)/(*kliterator_v2);
+            klvalue = klvalue + (*kliterator_v1)* MyLog(tmp);
+            cout << "KL value " << klvalue << " " << *kliterator_v1 << " " << *kliterator_v2 << " " << MyLog(tmp) <<"\n";
+          }
+      }
+     exit(1);
+    }
     
     return klvalue;
   }
