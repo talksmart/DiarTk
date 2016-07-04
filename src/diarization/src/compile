@@ -1,0 +1,14 @@
+#!/bin/bash
+g++ -o diarizeme \
+    *.cpp \
+    ../../realign/src/*.cpp \
+    ../../aibfeat/src/*.cpp \
+    ../../aIB/src/*.cpp \
+    -fopenmp \
+    ../../utils/src/*.cpp \
+    -I ../include/ \
+    -I ../../utils/include/ \
+    -I ../../aibfeat/include/ \
+    -I ../../aIB/include/ \
+    -I ../../realign/include \
+    -lboost_program_options

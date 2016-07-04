@@ -22,6 +22,9 @@ scpfile=$2
 opdir=$3
 fileid=$4
 maxclust=$5
+# maxdur is the maximum length of segments in ms
+# 250ms is 4000 samples.
+maxdur=250/1000*16000
 
 if [ $# -eq 5 ]; then
     beta_val=$5
@@ -45,5 +48,5 @@ $diarizeme_bin \
     --tmpdir $opdir \
     -s $scpfile \
     --beta $beta_val \
-    --maxclust $maxclust \
-    --nthread $nthreads > $opdir/$fileid.out
+#    --maxclust $maxclust \
+   --nthread $nthreads > $opdir/$fileid.out

@@ -51,7 +51,7 @@ int read_scp_file(const char *in_filename, int **out_seginfo, int *num_segs)
       ivel.push_back(start);
       ivel.push_back(end);
       pos.push_back(ivel);
-      printf("SCP READ %d %d\n",ivel[0], ivel[1]);
+      printf("SCP READ %d %d length=%d\n",ivel[0], ivel[1], ivel[1]-ivel[0]+1);
    }
 
    long last_speech_frame = ivel[1];
