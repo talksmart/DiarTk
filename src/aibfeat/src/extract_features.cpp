@@ -174,7 +174,7 @@ void compute_features(ConfigVars &configVars, vector<vector< float > > &postmat)
       fread(&n_frames,SIZE_LONG,1,featfp); //Number of frames
       fread(&s_rate,SIZE_LONG,1,featfp); //Sampling Rate
       fread(&byte_per_frame,SIZE_SHORT,1,featfp); //Number of byte_per_frame per frame
-      fread(&tc,SIZE_SHORT,1,featfp); //tc ??
+      fread(&tc,SIZE_SHORT,1,featfp); // kind
 
       n_frames = SwapByteOrderOfLong(&n_frames);
       byte_per_frame = SwapByteOrderOfShort(&byte_per_frame);
@@ -218,8 +218,10 @@ void compute_features(ConfigVars &configVars, vector<vector< float > > &postmat)
          mean_vec[i]=0.0;
          var_vec[i]=0.0;
       }
-      if (fseek(featfp,2*(SIZE_LONG+SIZE_SHORT),SEEK_SET) != 0) 
-          std::cout << "ERROR!!!!" << std::endl;
+      int ret = fseek(featfp,2*(SIZE_LONG+SIZE_SHORT),SEEK_SET);
+      if( ret != 0) {
+          std::cout << "ERROR!!!!: " << 2*(SIZE_LONG+SIZE_SHORT) << " " <<  ret << std::endl;
+      }
 
       float frame_val = 0;
       int seg_index = 0;
@@ -247,8 +249,9 @@ void compute_features(ConfigVars &configVars, vector<vector< float > > &postmat)
             yiter[1] = yiter[2];
             yiter[2] = uiter;
          }
-         if (f_index < first_index || f_index > last_index) 
+         if (f_index < first_index || f_index > last_index) {
            continue;
+         }
 
          //Only considering the speech frames
             for(d_index=0; d_index < frame_dim;  ++d_index)
@@ -273,9 +276,11 @@ void compute_features(ConfigVars &configVars, vector<vector< float > > &postmat)
                ++seg_index;
                index_times_dim += frame_dim;
                if(seg_index < num_segs) {
+                  printf("seg_index=%d first_index=%d last_index=%d n_frames=%d\n", seg_index-1, first_index, last_index, n_frames);
                   first_index = seg_ptr[2*seg_index]-1;
                   last_index = seg_ptr[2*seg_index+1]-1; 
                   if(last_index >= n_frames) last_index = n_frames-1; 
+                  printf("seg_index=%d first_index=%d last_index=%d n_frames=%d\n", seg_index, first_index, last_index, n_frames);
                   fflush(stdout);
                }
                else {
@@ -286,9 +291,25 @@ void compute_features(ConfigVars &configVars, vector<vector< float > > &postmat)
             }
       }
 
+     // fuchunpeng
+//     printf("print frame features\n");
+//     for(f_index=0; f_index < n_frames; ++f_index) {
+//            for(d_index=0; d_index < frame_dim;  ++d_index) {
+//               printf("%f ", frame_vec[f_index][d_index]);
+//            }
+//     }
+      // check if at the end of file
+     int current_pos = ftell(featfp);
+     fseek (featfp, 0, SEEK_END);   // non-portable
+     int end_size=ftell (featfp);
+     cout << "frame_dim: " << frame_dim << "\tn_frames:" << n_frames << endl; 
+     if (end_size != current_pos) {
+        cout << "WARNING: current_pos/end_size: " << current_pos << "/" << end_size;
+//	exit(1);
+     }     
       //num_segs=seg_index; //In case the number of segments is less
 
-      cout << "Number of segments in the file = " << num_segs << endl;
+      printf( "Number of segments in the file = %d, seg_index = %d\n ", num_segs, seg_index);
       int nfeats = 0;
 
       // performing feature selection and 
@@ -316,6 +337,7 @@ void compute_features(ConfigVars &configVars, vector<vector< float > > &postmat)
 
       FILE *outfp = NULL;
       num_gmm_comps = seg_index;
+      printf("num_gmm_comps=%d\n", num_gmm_comps);
 
       // printing the HMM to a file
       {
@@ -366,7 +388,10 @@ void compute_features(ConfigVars &configVars, vector<vector< float > > &postmat)
 
       // Part - III 
       //features to Posteriors 
-      if (fseek(featfp,2*(SIZE_LONG+SIZE_SHORT),SEEK_SET) != 0 ) std::cout << "ERROR!!!!!" << std::endl;
+      ret = fseek(featfp,2*(SIZE_LONG+SIZE_SHORT),SEEK_SET);
+      if( ret != 0 ) {
+	 std::cout << "feature to posteriors ERROR!!!!! " << 2*(SIZE_LONG+SIZE_SHORT) << " code:" << ret << std::endl;
+      }
       float *lkld = (float*) malloc(num_gmm_comps * sizeof(float));
       float *logwts = (float*) malloc(num_gmm_comps * sizeof(float));
       float *logVars = (float*) malloc(frame_dim * sizeof(float));
@@ -426,9 +451,11 @@ void compute_features(ConfigVars &configVars, vector<vector< float > > &postmat)
       __uint32_t n_frames_rev = SwapByteOrderOfLong(&n_frames);
       __uint16_t byte_per_frame_rev = SwapByteOrderOfShort(&byte_per_frame);
 
+      printf("feat.%d n_frames=%d ", diar_feature_index, n_frames);
       tc = 9; //USER Datatype in HTK
       tc = SwapByteOrderOfShort(&tc);
       byte_per_frame_rev = num_gmm_comps * SIZE_LONG;
+      printf("feat.%d byte_per_frame=%d ", diar_feature_index, byte_per_frame);
       byte_per_frame_rev = SwapByteOrderOfShort(&byte_per_frame_rev);
       fwrite(&n_frames_rev,SIZE_LONG,1,outfp); //Number of frames
       fwrite(&s_rate,SIZE_LONG,1,outfp); //Sampling Rate
@@ -616,9 +643,12 @@ void compute_features(ConfigVars &configVars, vector<vector< float > > &postmat)
          frame_dim = byte_per_frame / SIZE_LONG;
       }
       else{
-         if ( fseek(inpostfp[featIdx],2*(SIZE_LONG+SIZE_SHORT),SEEK_SET) != 0 ) std::cout << "ERROR!!!!!" << std::endl;
+         int ret = fseek(inpostfp[featIdx],2*(SIZE_LONG+SIZE_SHORT),SEEK_SET);
+         if( ret != 0 )
+            std::cout << "inpostfp ERROR!!!!!: " << 2*(SIZE_LONG+SIZE_SHORT)  << "\t" << ret << std::endl;
       }
 
+      printf( "n_frames: %d byte_per_frame: %d frame_dim: %d\n", n_frames, byte_per_frame, frame_dim);
 
       //Opening accumulated posteriors (input to clustering)
       ss << configVars.m_tmpDir << "/"<<configVars.id<<".feat."<< featIdx;
@@ -653,6 +683,7 @@ void compute_features(ConfigVars &configVars, vector<vector< float > > &postmat)
             out_frame[d_index] += feat_wt*SwapByteOrderOfFloat(iter);
       }
 
+      // note(fuchunpeng): these two lines of code are not usesful?
       for(d_index=0,iter=out_frame; d_index < frame_dim;++iter, ++d_index)
          *iter = SwapByteOrderOfFloat(iter);
 
@@ -671,6 +702,7 @@ void compute_features(ConfigVars &configVars, vector<vector< float > > &postmat)
       for (featIter = configVars.m_feats.begin(),featIdx = 0; featIter < configVars.m_feats.end(); ++featIdx, ++featIter)
       {
          float feat_wt = featIter->m_wt;
+         // note(fuchunpeng): why has anything relatd to in_frame?
          float *iter = in_frame;
          for(d_index=0; d_index < frame_dim; ++d_index)
          {
