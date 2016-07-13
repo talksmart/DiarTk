@@ -1,6 +1,6 @@
 #!/bin/bash
-#g++ -o diarizeme \
-g++ -g -o diarizeme \
+#g++ -g -o diarizeme \
+g++ -o diarizeme \
     *.cpp \
     ../../realign/src/*.cpp \
     ../../aibfeat/src/*.cpp \
