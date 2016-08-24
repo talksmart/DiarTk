@@ -195,7 +195,7 @@ namespace libtools
     int ismatrix=1;
     vector < vector<double> >::iterator rowiter;
     
-    if (mm->size() < 2) {  ismatrix=0; }
+    if (mm->size() < 1) {  ismatrix=0; }
 
     unsigned int columndim = (unsigned int) (*mm)[0].size();
         

@@ -320,6 +320,8 @@ void load_prepare_and_cluster(vector <vector <float> >&II ,
 {
     vector< vector<double> > AA(II.size(),vector<double>(II[0].size(),0));
 
+    cout << "\n\n Prepare the data matrix :\n";
+    cout << "matrix size: " << II.size() << "\n";
     for (unsigned int i=0; i < II.size(); i++) {  
         copy(II[i].begin(),II[i].end(),AA[i].begin()); 
     }
