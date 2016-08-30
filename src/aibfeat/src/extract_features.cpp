@@ -38,7 +38,7 @@ using namespace std;
 
 #define PRECISION 1.0e7
 
-double find_log_likelihood(float *frame_vec,double *meanvec,float* logVars, double *var_vec, bool *isVar, int dim);
+//double find_log_likelihood(float *frame_vec,double *meanvec,float* logVars, double *var_vec, bool *isVar, int dim);
 
 void compute_features(ConfigVars &configVars, vector<vector< float > > &postmat)
 {
@@ -742,6 +742,7 @@ void compute_features(ConfigVars &configVars, vector<vector< float > > &postmat)
    free (pur_seg_ptr);  
 }
 
+/*
 double find_log_likelihood(float *frame_vec,double *meanvec,float* logVars, double *prec_vec, bool *isVar, int dim)
 {
    double likelihood = 0;
@@ -759,4 +760,4 @@ double find_log_likelihood(float *frame_vec,double *meanvec,float* logVars, doub
    likelihood = -likelihood*0.5 ;
    return likelihood;
 }
-
+*/

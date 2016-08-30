@@ -287,7 +287,7 @@ void Gaussian::Initialize(int dim)
    Var = new float[DIM];
    logVar = new float[DIM];
 
-   //printf("The Gaussian component is initialized\n");
+   printf("The Gaussian component is initialized\n");
 
 }
 void Gaussian::SetMean(const float* mean)
