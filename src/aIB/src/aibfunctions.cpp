@@ -287,44 +287,9 @@ void load_prepare_and_cluster(const char* inputmatrix, const char* outputfile,
     cout << "\n\n Loading the data matrix : "<< inputmatrix << "\n\n";
     vector< vector<double> > AA(1,vector<double>(1,0));
     vector< vector<double> > nozeros_AA(1,vector<double>(1,0));
-    double t0, t1, t2;
-    t0 = get_cpu_time();
     readmatrixfromfile_and_resize(inputmatrix,&AA);
-    t1 = get_cpu_time();
 
-    if (libtools::check_if_matrix(&AA)) { 
-        cout << " The matrix seems ok\n"; 
-    } 
-    else  {
-        cout << "Error in reading the matrix\n"; 
-        throw somethingwrongininputmatrix();
-    }
-    cout << "check matrix seconds:" << t1 - t0;
-
-    libtools::remove_emptycolumn_fromcounts(&AA,&nozeros_AA);
-    t2 = get_cpu_time();
-    cout << "remove empty column in seconds: " << t2 - t1;
-
-    vector<int> v_maxclust(maxclustnum);
-    for(unsigned int ii=0; ii<maxclustnum; ii++) { v_maxclust[ii]=ii; }
-    vector<int> v_sol(1,0);
-
-    cout << " Final Matrix size after zero removal " << nozeros_AA.size() << " " 
-         << nozeros_AA[0].size() << "  \n";
-
-    DoAIBclustering(&nozeros_AA,beta_tvalue,1,v_maxclust,nmi_tvalue,&v_sol,ff);
-
-    cout << " The clustering has finished. Now saving the solution in " 
-         << outputfile << endl;
-
-    ///increase the index value to one to match the matlab output
-
-    for (vector<int>::iterator ii=v_sol.begin(); ii !=v_sol.end(); ii++) { 
-        *ii=*ii+1;  
-    }
-    Tprint(&v_sol,outputfile);
-
-    cout << " ...and saying goodbye \n";
+   cluster(AA, outputfile, maxclustnum, nmi_tvalue, beta_tvalue, ff);
 }
 
 
@@ -333,8 +298,6 @@ void load_prepare_and_cluster(vector <vector <float> >&II ,
                               double nmi_tvalue, double beta_tvalue, 
                               functionals ff)
 {
-    double t0, t1;
-    t0 = get_cpu_time();
     cout << "\n\n Prepare the data matrix :\n";
     cout << "matrix size: " << II.size() << "\n";
     vector< vector<double> > AA(II.size(),vector<double>(II[0].size(),0));
@@ -342,27 +305,33 @@ void load_prepare_and_cluster(vector <vector <float> >&II ,
         copy(II[i].begin(),II[i].end(),AA[i].begin()); 
     }
 
+   cluster(AA, outputfile, maxclustnum, nmi_tvalue, beta_tvalue, ff);
+}
 
+
+void cluster(vector <vector <double> >&AA ,
+             const char* outputfile, unsigned int maxclustnum,
+             double nmi_tvalue, double beta_tvalue,
+             functionals ff)
+{
     vector< vector<double> > nozeros_AA(1,vector<double>(1,0));
-    if (libtools::check_if_matrix(&AA)) { 
-        cout << " The matrix seems ok\n"; 
+    if (libtools::check_if_matrix(&AA)) {
+        cout << " The matrix seems ok\n";
     }
     else {
-        cout << "Error in reading the matrix\n"; 
+        cout << "Error in reading the matrix\n";
         throw somethingwrongininputmatrix();
     }
 
     libtools::remove_emptycolumn_fromcounts(&AA,&nozeros_AA);
 
     vector<int> v_maxclust(maxclustnum);
-    for(unsigned int ii=0; ii<maxclustnum; ii++) { 
-        v_maxclust[ii]=ii; 
+    for(unsigned int ii=0; ii<maxclustnum; ii++) {
+        v_maxclust[ii]=ii;
     }
     vector<int> v_sol(1,0);
 
-    t1 = get_cpu_time();
-    cout << " Time in seconds for matrix prep: " << t1 - t0;
-    cout << " Final Matrix size after zero removal " << nozeros_AA.size() 
+    cout << " Final Matrix size after zero removal " << nozeros_AA.size()
          << " " << nozeros_AA[0].size() << "  \n";
 
     double t2, t3;
@@ -370,11 +339,11 @@ void load_prepare_and_cluster(vector <vector <float> >&II ,
     DoAIBclustering(&nozeros_AA,beta_tvalue,1,v_maxclust,nmi_tvalue,&v_sol,ff);
     t3 = get_cpu_time();
     cout << " Clustering take seconds : " << t3 - t2 << "\n";
-    cout << " The clustering has finished. Now saving the solution in " 
+    cout << " The clustering has finished. Now saving the solution in "
          << outputfile << endl;
 
-    for (vector<int>::iterator ii=v_sol.begin(); ii !=v_sol.end(); ii++) { 
-        *ii=*ii+1;  
+    for (vector<int>::iterator ii=v_sol.begin(); ii !=v_sol.end(); ii++) {
+        *ii=*ii+1;
     }
     Tprint(&v_sol,outputfile);
 

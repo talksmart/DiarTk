@@ -54,4 +54,5 @@ void  store_misolutions(map<int,TT_elem_ptr>* history, vector <double> *sol, dou
 
 void load_prepare_and_cluster(const char* inputmatrix, const char* outputfile, unsigned int maxclustnum, double nmi_tvalue, double beta_tvalue,functionals ff);
 void load_prepare_and_cluster(vector <vector <float> >&II , const char* outputfile,unsigned int maxclustnum, double nmi_tvalue, double beta_tvalue, functionals ff);
+void cluster(vector <vector <double> >&II , const char* outputfile,unsigned int maxclustnum, double nmi_tvalue, double beta_tvalue, functionals ff);
 #endif
