@@ -87,8 +87,8 @@ void InitDeltaL(vector< vector<double> > *distances,TmpT* actualTmpT,Prm* actual
 
     unsigned int i=0,j=0;
 
-    time_t t1,t2;
-    time(&t1);
+    double t1,t2;
+    t1 = get_cpu_time();
 
     unsigned int ll=actualTmpT->get_tmpT_size();
     unsigned int ll2=actualTmpT->get_tmpT_size();
@@ -109,8 +109,8 @@ void InitDeltaL(vector< vector<double> > *distances,TmpT* actualTmpT,Prm* actual
     }
     #pragma omp taskwait
 
-    time(&t2);
-    cout << "Running time " << difftime(t2,t1) << "  \n"; 
+    t2 = get_cpu_time();
+    cout << "Running time " << t2 - t1 << "  seconds\n"; 
     return;
 }
 
@@ -179,6 +179,7 @@ void DoAIBclustering(vector <vector <double> >* InputM,double beta,int Uprior,
   bestmerge thisbestmerge;
   cout << "\n\n Now Clustering \n\n";
   
+  double t0 = get_cpu_time();
   for (mergenumcounter=1; 
           mergenumcounter < currentprm.getX(); 
           mergenumcounter++) {
@@ -191,17 +192,25 @@ void DoAIBclustering(vector <vector <double> >* InputM,double beta,int Uprior,
                                              &currentprm))));
 	  }
 
+      double t1,t2,t3;
+      t1 = get_cpu_time();
       Find_Bestmerge(&DeltaL,&thisbestmerge);
+      t2 = get_cpu_time();
       MergeAndUpdate(&DeltaL,&tmptaib,thisbestmerge.bm_l,thisbestmerge.bm_r,
                      mergenumcounter-1, &currentprm,ff);
       
+      t3 = get_cpu_time();
+//      cout << mergenumcounter << "/" << currentprm.getX();
+//      cout << " Find_Bestmerge " << t2 - t1 << " seconds, " << thisbestmerge.bm_l <<  ":" << thisbestmerge.bm_r << "\t";
+//      cout << "MergeAndUpdateBestmege " << t3 - t2 << " seconds\n\n ";
   }
-  cout << "\n";
+  double t4 = get_cpu_time();
+  cout << " takes time in seconds: " << t4 - t0 << endl;;
   
   //Do the last update
   TrackSolutions.insert(std::pair<int,TT_elem_ptr>(tmptaib.get_tmpT_size(),
                         TT_elem_ptr (new TT_elem(&tmptaib,&input,&currentprm))));
-  cout << "Saving this solution \n";
+  cout << "\nSaving this solution \n";
   
   vector <int> clusteringsolution (1,0);
   compute_modelselection_values(&TrackSolutions, &clusteringsolution, input.getI(), t_value_nmi);
@@ -278,7 +287,10 @@ void load_prepare_and_cluster(const char* inputmatrix, const char* outputfile,
     cout << "\n\n Loading the data matrix : "<< inputmatrix << "\n\n";
     vector< vector<double> > AA(1,vector<double>(1,0));
     vector< vector<double> > nozeros_AA(1,vector<double>(1,0));
+    double t0, t1, t2;
+    t0 = get_cpu_time();
     readmatrixfromfile_and_resize(inputmatrix,&AA);
+    t1 = get_cpu_time();
 
     if (libtools::check_if_matrix(&AA)) { 
         cout << " The matrix seems ok\n"; 
@@ -287,8 +299,11 @@ void load_prepare_and_cluster(const char* inputmatrix, const char* outputfile,
         cout << "Error in reading the matrix\n"; 
         throw somethingwrongininputmatrix();
     }
+    cout << "check matrix seconds:" << t1 - t0;
 
     libtools::remove_emptycolumn_fromcounts(&AA,&nozeros_AA);
+    t2 = get_cpu_time();
+    cout << "remove empty column in seconds: " << t2 - t1;
 
     vector<int> v_maxclust(maxclustnum);
     for(unsigned int ii=0; ii<maxclustnum; ii++) { v_maxclust[ii]=ii; }
@@ -318,10 +333,11 @@ void load_prepare_and_cluster(vector <vector <float> >&II ,
                               double nmi_tvalue, double beta_tvalue, 
                               functionals ff)
 {
-    vector< vector<double> > AA(II.size(),vector<double>(II[0].size(),0));
-
+    double t0, t1;
+    t0 = get_cpu_time();
     cout << "\n\n Prepare the data matrix :\n";
     cout << "matrix size: " << II.size() << "\n";
+    vector< vector<double> > AA(II.size(),vector<double>(II[0].size(),0));
     for (unsigned int i=0; i < II.size(); i++) {  
         copy(II[i].begin(),II[i].end(),AA[i].begin()); 
     }
@@ -344,11 +360,16 @@ void load_prepare_and_cluster(vector <vector <float> >&II ,
     }
     vector<int> v_sol(1,0);
 
+    t1 = get_cpu_time();
+    cout << " Time in seconds for matrix prep: " << t1 - t0;
     cout << " Final Matrix size after zero removal " << nozeros_AA.size() 
          << " " << nozeros_AA[0].size() << "  \n";
 
+    double t2, t3;
+    t2 = get_cpu_time();
     DoAIBclustering(&nozeros_AA,beta_tvalue,1,v_maxclust,nmi_tvalue,&v_sol,ff);
-
+    t3 = get_cpu_time();
+    cout << " Clustering take seconds : " << t3 - t2 << "\n";
     cout << " The clustering has finished. Now saving the solution in " 
          << outputfile << endl;
 

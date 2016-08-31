@@ -146,7 +146,7 @@ void FeatFileReader::readfeat(int fr_index, float* featvec)
    float *frame_ptr = NULL;
    long int offset = m_headersize + ( (m_indexMap[fr_index]) * m_byte_per_frame); 
    if ( fseek(m_featfp, offset,SEEK_SET) != 0) {
-	  std::cout << "ERROR!!!!" << std::endl;
+	  std::cout << "ERROR!!!!: " << fr_index <<  std::endl;
    }
 
     //Reading entire frame

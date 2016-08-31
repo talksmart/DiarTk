@@ -1,6 +1,8 @@
 #!/bin/bash
 #g++ -g -o diarizeme \
-g++ -o diarizeme \
+#g++ -fno-omit-frame-pointer -ggdb \
+g++ \
+    -o diarizeme \
     *.cpp \
     ../../realign/src/*.cpp \
     ../../aibfeat/src/*.cpp \

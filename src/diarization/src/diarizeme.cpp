@@ -291,11 +291,13 @@ int main (int argc, char** argv)
     cout << "compute features after: "<< aibfeat_end_time - start_time << endl;
     cout << "\n\n";
     
+    cout << "start load_prepare_and_cluster" << endl;
     load_prepare_and_cluster(postmat,outfile,maxclustnum,nmi_tvalue,beta_tvalue,thisfunc);
     aib_end_time = get_cpu_time();
     
-    cout << "\n\n";
-    
+    cout << "done clustering\n\n";
+    cout << "start realigning\n\n";
+
     dorealign(configVars);
     prg_end_time = get_cpu_time();
     
