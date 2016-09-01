@@ -1,6 +1,12 @@
 This README file explains, in brief, the commands to 
 compile and run the IB diarization toolkit.
 
+reference papers:
+
+http://publications.idiap.ch/downloads/papers/2009/Vijayasenan_TASLP_2009.pdf
+
+http://publications.idiap.ch/downloads/papers/2012/Vijayasenan_INTERSPEECH2012_2012.pdf
+
 # PREREQUISITES
 
 There are three prerequisites to the package

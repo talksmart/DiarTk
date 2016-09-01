@@ -43,20 +43,20 @@
 using namespace std;
 
 
-
-int check_if_sholdsave(Prm *lprm,int thisiter)
+// check if there is any possible solutions
+// matching the given value.
+int check_if_shouldsave(Prm *lprm,int thisiter)
 {
-    int foundit=0;
-
     const vector <int> *list_possible_solutions = lprm->getTsizes();
     vector <int>::const_iterator it;
 
     for (it=(*list_possible_solutions).begin(); 
            it !=(*list_possible_solutions).end(); it++) { 
-        if (*it == thisiter) 
-            foundit=1;   
+        if (*it == thisiter) {
+            return 1;
+        }
     }
-    return foundit;
+    return 0;
 }
 
 
@@ -114,9 +114,6 @@ void InitDeltaL(vector< vector<double> > *distances,TmpT* actualTmpT,Prm* actual
     return;
 }
 
-
-
-
 void Find_Bestmerge(vector< vector<double> > *dist_matrix, bestmerge *bestmcontainer )
 {
     double min=1E30;
@@ -128,7 +125,7 @@ void Find_Bestmerge(vector< vector<double> > *dist_matrix, bestmerge *bestmconta
 
     unsigned int p,q;
     for (p=0; p < m; p++) {
-        for (q=0; q < n; q++) {
+        for (q=p+1; q < n; q++) {
             if ((*dist_matrix)[p][q] < min) {
                 min_l=p; min_r=q; min=(*dist_matrix)[p][q];   
             }
@@ -174,18 +171,18 @@ void DoAIBclustering(vector <vector <double> >* InputM,double beta,int Uprior,
    
   map<int,TT_elem_ptr> TrackSolutions;
   
-
   unsigned int mergenumcounter=0;
   bestmerge thisbestmerge;
   cout << "\n\n Now Clustering \n\n";
   
   double t0 = get_cpu_time();
   for (mergenumcounter=1; 
-          mergenumcounter < currentprm.getX(); 
-          mergenumcounter++) {
+       mergenumcounter < currentprm.getX(); 
+       mergenumcounter++) {
       coolprint(mergenumcounter,currentprm.getX());
       
-      if (check_if_sholdsave(&currentprm , tmptaib.get_tmpT_size()) >0 ) {
+      if (check_if_shouldsave(&currentprm , tmptaib.get_tmpT_size()) >0 ) {
+          cout << "Found solution: " << mergenumcounter << "/" << tmptaib.get_tmpT_size() << endl;
           TrackSolutions.insert(std::pair<int,TT_elem_ptr>(tmptaib.get_tmpT_size(), 
                                 TT_elem_ptr (new TT_elem(&tmptaib,
                                              &input,
@@ -276,7 +273,7 @@ void compute_modelselection_values(map<int,TT_elem_ptr>* history,vector <int> *s
 void coolprint(int a, int b)
 {
     double percentage=1000*((double)a/(double)b);
-    if ((int)floor(percentage)%10 == 0) { cerr << "-"; }
+    if ((int)floor(percentage)%10 == 0) { cerr << "-"<<a<<"/"<<b; }
 }
 
 
