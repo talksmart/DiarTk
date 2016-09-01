@@ -202,7 +202,6 @@ TmpT::~TmpT(){
 }
 
 
-int TmpT::get_tmpT_size() { return tmpt_size;  }
 vector <double> *  TmpT::get_Py_t(int ii) { return &((*Py_t)[ii]); }
 double TmpT::get_Pt(int ii) { return (*Pt)[ii]; }
 vector <int> *  TmpT::get_Pt_x() { return Pt_x; }

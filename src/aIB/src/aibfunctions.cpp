@@ -82,16 +82,16 @@ double CalcDelta(vector<double>* P_ytl, double p_tl, vector<double>* P_ytr, doub
 void InitDeltaL(vector< vector<double> > *distances,TmpT* actualTmpT,Prm* actualPrm,functionals ff)
 {
     cout << " Initializing the Delta -- Computing " 
-         << actualTmpT->get_tmpT_size()+1 << " times " 
-         << actualTmpT->get_tmpT_size()+1 << " Distances \n";
+         << actualTmpT->get_tmpt_size()+1 << " times " 
+         << actualTmpT->get_tmpt_size()+1 << " Distances \n";
 
     unsigned int i=0,j=0;
 
     double t1,t2;
     t1 = get_cpu_time();
 
-    unsigned int ll=actualTmpT->get_tmpT_size();
-    unsigned int ll2=actualTmpT->get_tmpT_size();
+    unsigned int ll=actualTmpT->get_tmpt_size();
+    unsigned int ll2=actualTmpT->get_tmpt_size();
 
     omp_set_num_threads(ff.threads_num);
 
@@ -164,8 +164,8 @@ void DoAIBclustering(vector <vector <double> >* InputM,double beta,int Uprior,
   Inp input(InputM,1);
   TmpT tmptaib(&input,&currentprm);
 
-  vector< vector<double> > DeltaL(tmptaib.get_tmpT_size()+1, 
-                                  vector<double>(tmptaib.get_tmpT_size()+1, 
+  vector< vector<double> > DeltaL(tmptaib.get_tmpt_size()+1, 
+                                  vector<double>(tmptaib.get_tmpt_size()+1, 
                                                  numeric_limits<double>::max()));
   InitDeltaL(&DeltaL,&tmptaib,&currentprm, ff);
    
@@ -181,9 +181,9 @@ void DoAIBclustering(vector <vector <double> >* InputM,double beta,int Uprior,
        mergenumcounter++) {
       coolprint(mergenumcounter,currentprm.getX());
       
-      if (check_if_shouldsave(&currentprm , tmptaib.get_tmpT_size()) >0 ) {
-          cout << "Found solution: " << mergenumcounter << "/" << tmptaib.get_tmpT_size() << endl;
-          TrackSolutions.insert(std::pair<int,TT_elem_ptr>(tmptaib.get_tmpT_size(), 
+      if (check_if_shouldsave(&currentprm , tmptaib.get_tmpt_size()) >0 ) {
+          cout << "Found solution: " << mergenumcounter << "/" << tmptaib.get_tmpt_size() << endl;
+          TrackSolutions.insert(std::pair<int,TT_elem_ptr>(tmptaib.get_tmpt_size(),
                                 TT_elem_ptr (new TT_elem(&tmptaib,
                                              &input,
                                              &currentprm))));
@@ -205,7 +205,7 @@ void DoAIBclustering(vector <vector <double> >* InputM,double beta,int Uprior,
   cout << " takes time in seconds: " << t4 - t0 << endl;;
   
   //Do the last update
-  TrackSolutions.insert(std::pair<int,TT_elem_ptr>(tmptaib.get_tmpT_size(),
+  TrackSolutions.insert(std::pair<int,TT_elem_ptr>(tmptaib.get_tmpt_size(),
                         TT_elem_ptr (new TT_elem(&tmptaib,&input,&currentprm))));
   cout << "\nSaving this solution \n";
   
@@ -242,7 +242,7 @@ void compute_modelselection_values(map<int,TT_elem_ptr>* history,vector <int> *s
         if(nmi > nmithreshold && found_solution==0)
         {
             key_to_solution=(*ii).first;
-            // found_solution=1;
+            found_solution=1;
         }
     }
 
@@ -339,6 +339,8 @@ void cluster(vector <vector <double> >&AA ,
     cout << " The clustering has finished. Now saving the solution in "
          << outputfile << endl;
 
+    // increment the speaker index by one since v_vol starts from 0
+    // and we want speaker index to start from 1.
     for (vector<int>::iterator ii=v_sol.begin(); ii !=v_sol.end(); ii++) {
         *ii=*ii+1;
     }

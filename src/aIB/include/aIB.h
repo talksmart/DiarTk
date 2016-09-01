@@ -67,7 +67,7 @@ class Prm {
  protected:
   unsigned int X,Y;
   double beta;
-  vector <int>* Tsizes;
+  vector <int>* Tsizes; // vector of integters from 0 to maxclustnum-1
   int Uniformpriors;
 };
 
@@ -95,7 +95,6 @@ class TmpT{
  public:
   TmpT(Inp * input, Prm * currprm);
   ~TmpT();
-  int get_tmpT_size();
   vector<double>* get_Py_t(int ii);
   vector<int>* get_Pt_x();
   double get_Info_Ity(int ii);
